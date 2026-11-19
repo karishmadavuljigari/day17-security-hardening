@@ -1,215 +1,137 @@
-\# Day 16 Authentication Project — Demo Storyline
+# Day 17 – FastAPI Security Hardening Demo
 
+**Project:** FastAPI Security Hardening  
+**GitHub:** https://github.com/karishmadavuljigari/day17-security-hardening  
+**Duration:** 8–10 minutes
 
+## 1. Introduction
 
-\## 1. Introduction
+"Today I am demonstrating the security hardening work completed on my FastAPI Knowledge Assistant application.
 
+The objective was to improve application security through security headers, CORS restrictions, rate limiting, request-size protection, secure file uploads, dependency scanning, static analysis and secret detection."
 
+## 2. Start the application
 
-This project extends the Knowledge Assistant with secure user registration, authentication, session management, role-based access control, and record ownership protection.
-
-
-
-The goal is to protect user accounts and private records while retaining the existing policy retrieval functionality.
-
-
-
-\## 2. Demo Sequence
-
-
-
-\### Step 1: Register a User
-
-
-
-\- Open `/register`.
-
-\- Register with a valid email and a password of at least 15 characters.
-
-\- Explain that passwords are validated against a local blocklist.
-
-\- Explain that passwords are stored as Argon2id hashes, never as plaintext.
-
-
-
-\### Step 2: Demonstrate Password Validation
-
-
-
-Explain the implemented password rules:
-
-
-
-\- Minimum 15 characters.
-
-\- Accept passwords of 64 characters or more.
-
-\- Reject passwords found in the local blocklist.
-
-\- No mandatory uppercase, lowercase, digit, or special-character composition rules.
-
-\- No forced periodic password rotation.
-
-
-
-Mention that the current blocklist is a small demonstration list and should be expanded for production.
-
-
-
-\### Step 3: Log In
-
-
-
-\- Log in with the registered credentials.
-
-\- Show that successful authentication creates a server-side session.
-
-\- Explain that the browser receives an opaque session cookie.
-
-\- Explain the HttpOnly, SameSite, and Secure cookie settings.
-
-
-
-\### Step 4: Demonstrate Protected Knowledge Assistant
-
-
-
-\- Open the homepage while logged in.
-
-\- Submit a policy-related question.
-
-\- Show that the existing policy retrieval functionality still works.
-
-\- Explain that unauthenticated users are redirected to the login page.
-
-
-
-\### Step 5: Demonstrate Login Protection
-
-
-
-\- Explain the login throttling rule: five failed attempts within 15 minutes.
-
-\- Explain that failed attempts are tracked using a hashed email identifier.
-
-\- Show the relevant automated tests rather than repeatedly locking a real account.
-
-
-
-\### Step 6: Demonstrate RBAC
-
-
-
-\- Access `/admin` as an employee.
-
-\- Show that access is denied with HTTP 403.
-
-\- Explain that only users with the admin role can access the admin endpoint.
-
-\- Explain that denied access is recorded as `ACCESS\_DENIED`.
-
-
-
-\### Step 7: Demonstrate Object-Level Ownership
-
-
-
-\- Create or use two separate user accounts.
-
-\- Show that each user can access their own record.
-
-\- Attempt to access the other user's record.
-
-\- Show HTTP 404 and confirm that private record content is not returned.
-
-\- Explain that admins cannot bypass record ownership checks.
-
-
-
-\### Step 8: Demonstrate Audit Logging
-
-
-
-Explain that the audit system records registration, login success, login failure, logout, access denial, and IDOR-related events.
-
-
-
-Show the audit event counts and the IDOR attempt log.
-
-
-
-\### Step 9: Demonstrate Logout
-
-
-
-\- Submit the logout form.
-
-\- Explain that the server-side session is revoked.
-
-\- Show that the browser cookies are cleared.
-
-\- Attempt to revisit the protected homepage.
-
-\- Show that the user must log in again.
-
-
-
-\## 3. Testing Evidence
-
-
-
-Run the complete automated test suite:
-
-
+Run:
 
 ```cmd
-
-python -m pytest -v
-
+python -m uvicorn src.main:app --reload
 ```
 
+Open `http://127.0.0.1:8000`.
 
+Explain that the application uses FastAPI and that security controls are implemented through middleware and endpoint validation.
 
-Show the final test summary and explain that the tests cover password validation, authentication, session invalidation, throttling, CSRF, audit logging, RBAC, and ownership checks.
+## 3. Demonstrate security headers
 
+Open another CMD window and run:
 
+```cmd
+curl.exe -I http://127.0.0.1:8000/
+```
 
-\## 4. Closing Summary
+Explain these headers:
 
+- Content-Security-Policy: restricts browser resource loading.
+- X-Content-Type-Options: nosniff: prevents MIME-type sniffing.
+- X-Frame-Options: DENY: prevents framing.
+- Referrer-Policy: controls referrer information.
+- Permissions-Policy: restricts browser features.
 
+## 4. Demonstrate CORS
 
-The project demonstrates a layered authentication and authorization design:
+Open `src/main.py` and show the CORS configuration.
 
+Explain that only the configured local origins, GET and POST methods, and required headers are allowed.
 
+Configured origins:
+- http://127.0.0.1:8000
+- http://localhost:8000
 
-\- Argon2id password hashing.
+## 5. Demonstrate rate limiting and request-size protection
 
-\- NIST-aligned password validation.
+Show:
+- `src/security/rate_limit.py`
+- The request-size middleware in `src/main.py`.
 
-\- Server-side session management.
+Explain:
+- Rate limiting allows five requests per 60 seconds per client on `/ask`.
+- Request bodies are limited to 1 MB.
+- Oversized requests receive HTTP 413.
 
-\- Secure cookie settings and CSRF protection.
+Show the corresponding tests.
 
-\- Login throttling.
+## 6. Demonstrate secure file uploads
 
-\- Centralized role-based authorization.
+Open the upload endpoint in `src/main.py`.
 
-\- Object-level ownership enforcement.
+Explain:
+- Authentication and CSRF validation are required.
+- Only `.txt` files with `text/plain` content type are accepted.
+- Maximum upload size is 512 KB.
+- UTF-8 validation and null-byte rejection are performed.
+- The server generates a random filename rather than trusting the uploaded filename.
 
-\- Security audit logging.
+Show the upload tests in `tests/test_app.py`.
 
-\- Automated security tests.
+## 7. Demonstrate security scans
 
+Open the reports under `docs/security/`.
 
+Show:
+- `pip_audit.txt`
+- `bandit_report.txt`
+- `semgrep_report.txt`
 
-\## 5. Known Limitations
+Explain the results:
+- pip-audit: no known vulnerabilities after upgrading pip.
+- Bandit: zero findings across 1,141 lines.
+- Semgrep: zero findings across 19 files using 151 Python rules.
+- pip check: no broken requirements.
 
+## 8. Demonstrate AI code review and Gitleaks
 
+Open `docs/security/ai_code_review.md`.
 
-\- The local password blocklist is a demonstration list, not a comprehensive breached-password database.
+Explain that six insecure examples were reviewed:
+- SQL injection
+- Plaintext password storage
+- Hardcoded secrets
+- Missing CSRF validation
+- Path traversal
+- Insecure cookie settings
 
-\- Login throttling currently uses an email identifier; production should also consider IP-based or combined throttling.
+Then open `docs/security/leaked_secret_drill.md`.
 
-\- Secure cookies must be enabled when deployed over HTTPS.
+Explain that a fake secret was committed in a separate temporary repository, detected by Gitleaks, followed by simulated rotation and Git history cleanup. The final scan verified the cleaned repository.
 
-\- Production deployment requires additional operational hardening.
+Do not display real credentials or private secret values.
+
+## 9. Demonstrate automated tests
+
+Stop the application if necessary and run:
+
+```cmd
+python -m pytest -v
+```
+
+Explain:
+
+"The final test run completed with 60 passed and one non-blocking deprecation warning."
+
+## 10. Conclusion
+
+"I implemented multiple layers of security protection for the FastAPI application, reviewed dependencies, scanned the source code, reviewed insecure AI-generated examples and completed a secret-detection drill.
+
+The automated tests passed, and the project was committed and pushed to GitHub."
+
+GitHub repository:
+
+https://github.com/karishmadavuljigari/day17-security-hardening
+
+## Known limitations
+
+- The request-size middleware uses Starlette's private `request._body` attribute, which needs compatibility review during future upgrades.
+- One non-blocking Starlette/httpx deprecation warning remains.
+- Local development CORS origins and cookie settings need production review.
+- The common-password blocklist should be expanded for production use.
