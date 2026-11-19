@@ -1,0 +1,20 @@
+
+<div class="answer-card">
+    <h2>Answer</h2>
+
+    <h3>Your question</h3>
+    <p>{{ question }}</p>
+
+    <h3>Response</h3>
+    <p>{{ answer }}</p>
+
+    {% if sources %}
+        <h3>Sources</h3>
+
+        <ul>
+            {% for item in sources %}
+                <li>{{ item.source }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

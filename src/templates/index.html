@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Assistant</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ request.url_for('static', path='css/style.css') }}"
+    >
+
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="{{ request.url_for('static', path='js/htmx-errors.js') }}"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Knowledge Assistant</h1>
+        <p>Ask questions and get answers from the knowledge base.</p>
+    </header>
+
+    <main>
+        <section aria-labelledby="welcome-heading">
+            <h2 id="welcome-heading">How can I help you?</h2>
+
+            <p>
+                Logged in as:
+                <strong>{{ user.email }}</strong>
+            </p>
+
+            <form action="/logout" method="post">
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <button type="submit">Logout</button>
+            </form>
+
+            <hr>
+
+            <form
+                hx-post="/ask"
+                hx-target="#answer-area"
+                hx-swap="innerHTML"
+                hx-indicator="#loading-status"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <label for="question">Enter your question:</label>
+
+                <input
+                    type="text"
+                    id="question"
+                    name="question"
+                    placeholder="Ask a question..."
+                    required
+                >
+
+                <button type="submit">Ask</button>
+            </form>
+
+            <p
+                id="loading-status"
+                class="htmx-indicator"
+                role="status"
+            >
+                Searching policy documents...
+            </p>
+
+            <div id="answer-area" aria-live="polite">
+            </div>
+
+        </section>
+    </main>
+
+</body>
+</html>

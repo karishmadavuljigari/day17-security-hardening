@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Knowledge Assistant</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ request.url_for('static', path='css/style.css') }}"
+    >
+</head>
+<body>
+
+    <header>
+        <h1>Knowledge Assistant</h1>
+        <p>Sign in to access your knowledge base.</p>
+    </header>
+
+    <main>
+        <section aria-labelledby="login-heading">
+            <h2 id="login-heading">Login</h2>
+
+            {% if error %}
+                <p class="error-message" role="alert">{{ error }}</p>
+            {% endif %}
+
+            <form action="/login" method="post">
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <label for="email">Email:</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                >
+
+                <label for="password">Password:</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                >
+
+                <button type="submit">Login</button>
+            </form>
+
+            <p>
+                Don't have an account?
+                <a href="/register">Register here</a>
+            </p>
+        </section>
+    </main>
+
+</body>
+</html>

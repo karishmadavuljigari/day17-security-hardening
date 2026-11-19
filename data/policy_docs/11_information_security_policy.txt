@@ -1,0 +1,8 @@
+TechNova Solutions - Information Security Policy
+
+Employees must protect confidential company and customer information.
+Company information must only be stored in approved company systems.
+Employees must not share confidential information with unauthorized people.
+Lost or stolen company devices must be reported to IT within 1 hour of discovery.
+Security incidents must be reported immediately to the security team.
+Employees must lock their computers whenever they leave their desks.

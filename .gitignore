@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.db
+src/main_day14_backup.py
+docs/consulting_practice.md
+docs/implementation_plan.md
+docs/screenshots/
+docs/ux_checklist.md
+docs/xss_test_evidence.md
